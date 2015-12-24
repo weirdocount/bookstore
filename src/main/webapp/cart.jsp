@@ -54,9 +54,11 @@
                 if(num == 0){
                     var flag2 = confirm("确认要删除"+title+"吗？")
                     if(flag2){
-                        //bookServlet?method=removeBook&pageNo=${param.pageNo }&id=${item.id }
-                        var args = {"method":removeBook,"pageNo":${param.pageNo },"id":idStr}
-//                        $.post("bookServlet",args,function(){});
+                        <%--//bookServlet?method=removeBook&pageNo=${param.pageNo }&id=${item.id }--%>
+                        var args = {"method":"removeBook","pageNo":"5","id":idStr}
+                        var $a = $tr.find("td:last").find("a");
+//                        $a[0].onclick();
+                        $.post("bookServlet",args,function(){},"JSON");
                         return;
                     }
                 }
