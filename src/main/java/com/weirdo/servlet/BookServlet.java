@@ -10,6 +10,8 @@ import com.weirdo.service.BookService;
 import com.weirdo.service.CartService;
 import com.weirdo.util.CartUtil;
 import com.weirdo.util.QueryCondition;
+import com.weirdo.util.Validator;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -241,5 +243,33 @@ public class BookServlet extends HttpServlet {
 		String msg = "修改商品数量出错";
 		request.setAttribute("msg",msg);
 		request.getRequestDispatcher("/error.jsp").forward(request,response);
+	}
+
+	protected void cash(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+		String username = request.getParameter("username");
+		String accountIdStr = request.getParameter("accountId");
+
+		//校验表单
+		String msg = new String();
+		if (StringUtils.isEmpty(username) || StringUtils.isEmpty(accountIdStr)){
+			msg = "输入不能为空";
+		}
+		if (StringUtils.isEmpty(msg)){
+			//校验用户是否存在
+			msg = Validator.ValidateUser(username,accountIdStr);
+			if (StringUtils.isEmpty(msg)){
+				//校验金额
+				msg = Validator.ValidateMoney(request,accountIdStr);
+			}
+		}
+
+		if (!StringUtils.isEmpty(msg)){
+			request.setAttribute("msg",msg);
+			request.getRequestDispatcher("/cash.jsp").forward(request,response);
+			return;
+		}
+		//验证通过执行具体的逻辑操作
+		cartService.cash(CartUtil.getCart(request),username,accountIdStr);
+		response.sendRedirect(request.getContextPath()+"/success.jsp");
 	}
 }

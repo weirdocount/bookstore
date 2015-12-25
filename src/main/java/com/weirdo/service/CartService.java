@@ -1,18 +1,22 @@
 package com.weirdo.service;
 
-import com.weirdo.dao.BookDAO;
-import com.weirdo.dao.impl.BookDAOImpl;
-import com.weirdo.dataobject.Book;
-import com.weirdo.dataobject.Cart;
-import com.weirdo.dataobject.CartItem;
+import com.weirdo.dao.*;
+import com.weirdo.dao.impl.*;
+import com.weirdo.dataobject.*;
+
+import java.sql.Date;
+import java.util.Collection;
 
 /**
  * Created by DQ on 2015/12/22.
  */
 public class CartService {
 
-    BookDAO bookDAO = new BookDAOImpl();
-
+    private BookDAO bookDAO = new BookDAOImpl();
+    private AccountDAO accountDAO = new AccountDAOImpl();
+    private TradeDAO tradeDAO = new TradeDAOImpl();
+    private UserDAO userDAO = new UserDAOImpl();
+    private TradeItemDAO tradeItemDAO = new TradeItemDAOImpl();
     /**
      * 购买一本书籍
      * @param cart
@@ -53,12 +57,23 @@ public class CartService {
         }
     }
 
+    /**
+     * 清空购物车中的某个书籍
+     * @param cart
+     */
     public void clearItem(Cart cart){
         cart.getMap().clear();
         cart.setTotalMoney(0.0);
         cart.setTotalNum(0);
     }
 
+    /**
+     * 跟新购物车的数量
+     * @param cart
+     * @param id
+     * @param num
+     * @return
+     */
     public boolean updateItem(Cart cart,Integer id,int num){
         boolean result = false;
         Book book = bookDAO.getBookById(id);
@@ -73,4 +88,36 @@ public class CartService {
         }
         return result;
     }
+
+    /**
+     * 购买商品
+     * @param cart
+     * @param userName
+     * @param accountId
+     */
+    public void cash(Cart cart, String userName, String accountId){
+        //1.更新账户余额
+        accountDAO.updateBalance(Integer.parseInt(accountId),cart.getTotalMoney());
+
+        //2.向Trade中插入一条数据
+        Trade trade = new Trade();
+        User user = userDAO.getUserByUserName(userName);
+        trade.setUserId(user.getId());
+        trade.setDate(new Date(new java.util.Date().getTime()));
+        tradeDAO.inset(trade);
+
+        //3.批量插入明细
+        Collection<CartItem> items = cart.getItems();
+        for (CartItem item : items){
+            TradeItem tradeItem = new TradeItem();
+            tradeItem.setBookId(item.getId());
+            tradeItem.setNum(item.getNum());
+            tradeItem.setItemId(trade.getTradeId());
+            tradeItemDAO.insert(tradeItem);
+        }
+
+        //4.清空购物车
+        clearItem(cart);
+    }
+
 }
