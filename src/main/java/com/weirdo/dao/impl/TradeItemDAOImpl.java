@@ -28,8 +28,8 @@ public class TradeItemDAOImpl extends BaseDAO<TradeItem> implements TradeItemDAO
      * @return
      */
     public List<TradeItem> getTradeItemsByTradeId(Integer tradeId) {
-        String sql = "SELECT itemId tradeItemId, bookId, " +
-                "quantity, tradeId FROM tradeitem WHERE tradeid = ?";
+        String sql = "SELECT itemid itemId, bookId, " +
+                "quantity num, tradeId FROM tradeitem WHERE tradeid = ?";
         return new ArrayList<TradeItem>(queryForList(sql,tradeId));
     }
 }

@@ -2,12 +2,10 @@ package com.weirdo.servlet;
 
 
 import com.google.gson.Gson;
-import com.weirdo.dataobject.Book;
-import com.weirdo.dataobject.BookResult;
-import com.weirdo.dataobject.Cart;
-import com.weirdo.dataobject.CartItem;
+import com.weirdo.dataobject.*;
 import com.weirdo.service.BookService;
 import com.weirdo.service.CartService;
+import com.weirdo.service.UserService;
 import com.weirdo.util.CartUtil;
 import com.weirdo.util.QueryCondition;
 import com.weirdo.util.Validator;
@@ -16,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -225,7 +224,6 @@ public class BookServlet extends HttpServlet {
 		}
 
 		if(id > 0 && num > 0){
-			System.out.println("laile------");
 			Cart cart = CartUtil.getCart(request);
 			boolean result = cartService.updateItem(cart,id,num);
 			if (result) {
@@ -234,7 +232,6 @@ public class BookServlet extends HttpServlet {
 				map.put("totalMoney",cart.getTotalMoney());
 				Gson gson = new Gson();
 				String jsonStr = gson.toJson(map);
-				System.out.println("------"+jsonStr);
 				response.setContentType("text/javascript");
 				response.getWriter().print(jsonStr);
 				return;
@@ -271,5 +268,20 @@ public class BookServlet extends HttpServlet {
 		//验证通过执行具体的逻辑操作
 		cartService.cash(CartUtil.getCart(request),username,accountIdStr);
 		response.sendRedirect(request.getContextPath()+"/success.jsp");
+	}
+
+	protected void getTrades(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+		String username = request.getParameter("username");
+		if (StringUtils.isEmpty(username)){
+			String msg = "获取购买历史记录出错";
+			request.setAttribute("msg",msg);
+			request.getRequestDispatcher("/error.jsp").forward(request,response);
+			return;
+		}
+		UserService userService = new UserService();
+		List<Trade> trades = userService.getUserOrders(username);
+		request.setAttribute("trades",trades);
+		System.out.println(trades);
+		request.getRequestDispatcher("/WEB-INF/pages/trades.jsp").forward(request,response);
 	}
 }

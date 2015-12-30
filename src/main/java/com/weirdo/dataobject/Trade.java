@@ -1,6 +1,7 @@
 package com.weirdo.dataobject;
 
 import java.sql.Date;
+import java.util.List;
 
 /**
  * Created by daiqiang on 2015/12/25.
@@ -9,8 +10,17 @@ public class Trade {
     private Integer tradeId;
     private Integer userId;
     private Date date;
+    private List<TradeItem> tradeItems;
 
     public Trade() {
+    }
+
+    public List<TradeItem> getTradeItems() {
+        return tradeItems;
+    }
+
+    public void setTradeItems(List<TradeItem> tradeItems) {
+        this.tradeItems = tradeItems;
     }
 
     public Integer getTradeId() {
@@ -43,6 +53,7 @@ public class Trade {
                 "tradeId=" + tradeId +
                 ", userId=" + userId +
                 ", date=" + date +
+                ", tradeItems=" + tradeItems +
                 '}';
     }
 }

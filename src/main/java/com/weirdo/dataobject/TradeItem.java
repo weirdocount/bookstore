@@ -1,13 +1,18 @@
 package com.weirdo.dataobject;
 
+import com.weirdo.dao.BookDAO;
+import com.weirdo.dao.impl.BookDAOImpl;
+
 /**
  * Created by daiqiang on 2015/12/25.
  */
 public class TradeItem {
+
     private Integer itemId;
     private Integer bookId;
     private int num;
     private Integer tradeId;
+    private Book book;
 
     public TradeItem() {
     }
@@ -44,6 +49,14 @@ public class TradeItem {
         this.tradeId = tradeId;
     }
 
+    public Book getBook() {
+        return book;
+    }
+
+    public void setBook(Book book) {
+        this.book = book;
+    }
+
     @Override
     public String toString() {
         return "TradeItem{" +
@@ -51,6 +64,7 @@ public class TradeItem {
                 ", bookId=" + bookId +
                 ", num=" + num +
                 ", tradeId=" + tradeId +
+                ", book=" + book +
                 '}';
     }
 }
